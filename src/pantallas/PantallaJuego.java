@@ -43,7 +43,7 @@ public class PantallaJuego implements Pantalla {
 	final static int ALTO_LADRILLO = 25;
 	final static int VEL_BOLA = 8;
 	final static int VEL_BARRA = 15;
-
+	final static int MAX_BOLA = 2;
 	/** IMAGENES **/
 	private BufferedImage fondo;
 	private Image fondoEscalado, imagen_lateral, imagen_arriba, imagen_bola, imagen_barra;
@@ -51,16 +51,19 @@ public class PantallaJuego implements Pantalla {
 	/** SPRITE **/
 	Sprite barra_jugador;
 	Sprite[] margen = new Sprite[3];
+	ArrayList<Sprite> arrayBola = new ArrayList<Sprite>();
 	Sprite bola;
 	ArrayList<Sprite> ladrillos = new ArrayList<Sprite>();
 	Sprite ladrilloAux;
+	Sprite powerUp;
 
 	/** CONTROLAR MOVIMIENTO Y PRESION DE TECLAS **/
 	boolean movimientoTecla;
 	boolean jugando = false, pause = false;
 
 	/** OBTENER VELOCIDAD DE LA BOLA **/
-	int velX, velY;
+	int velXBola1, velXBola2;
+	int velYBola1, velYBola2;
 
 	/** VARIABLES PARA TIEMPO **/
 	final Font fuenteTiempo = new Font("Chiller", Font.BOLD, 20);
@@ -80,6 +83,8 @@ public class PantallaJuego implements Pantalla {
 	@Override
 	public void inicializarPantalla(PanelJuego panelJuego) {
 		this.panelJuego = panelJuego;
+		powerUp = null;
+
 		try {
 			fondo = ImageIO.read(new File("img/fondoJuego.jpg"));
 			imagen_barra = ImageIO.read(new File("img/barra.png"));
@@ -109,6 +114,11 @@ public class PantallaJuego implements Pantalla {
 				tiempoTotal = tiempoAcumulado + c.getTiempoTranscurrido();
 				comprobarVictoria();
 				comprobarColision();
+				if (powerUp != null) {
+					powerUp.actualizarPosicion(panelJuego);
+					colisionPowerUp();
+				}
+
 			}
 		}
 
@@ -191,14 +201,16 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void iniciarJuego() {
 		if (!jugando) {
+			for (int i = 0; i < arrayBola.size(); i++) {
+				if (new Random().nextInt(2) == 0) {
+					arrayBola.get(i).setVelX(new Random().nextInt(9));
+				} else {
+					arrayBola.get(i).setVelX(new Random().nextInt(9) - 8);
+				}
 
-			if (new Random().nextInt(2) == 0) {
-				bola.setVelX(new Random().nextInt(9));
-			} else {
-				bola.setVelX(new Random().nextInt(9) - 8);
+				arrayBola.get(i).setVelY(-VEL_BOLA);
+
 			}
-
-			bola.setVelY(-VEL_BOLA);
 			jugando = true;
 			c = new Cronometro();
 			c.comenzar(0);
@@ -220,18 +232,35 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void pauseGame() {
 		if (!pause) {
-			velX = bola.getVelX();
-			velY = bola.getVelY();
-			barra_jugador.setVelX(0);
-			bola.setVelX(0);
-			bola.setVelY(0);
+			for (int i = 0; i < arrayBola.size(); i++) {
+				velXBola1 = arrayBola.get(i).getVelX();
+				velYBola1 = arrayBola.get(i).getVelY();
+				System.out.println("Velx -> "+velXBola1 + " VelY -> " + velYBola1);
+				if (arrayBola.size() < 2) {
+					System.out.println("hola.");
+				}
+				barra_jugador.setVelX(0);
+				arrayBola.get(i).setVelX(0);
+				arrayBola.get(i).setVelY(0);
+
+			}
+			if (powerUp != null) {
+				powerUp.setVelY(0);
+			}
 			tiempoAcumulado += c.getTiempoTranscurrido();
 			c.parar(tiempoAcumulado);
 			pause = true;
 		} else {
 			barra_jugador.setVelX(-VEL_BARRA);
-			bola.setVelX(velX);
-			bola.setVelY(velY);
+			System.out.println("Velx -> "+velXBola1 + " VelY -> " + velYBola1);
+			for (int i = 0; i < arrayBola.size(); i++) {
+				arrayBola.get(i).setVelX(velXBola1);
+				arrayBola.get(i).setVelY(velYBola1);
+			}
+
+			if (powerUp != null) {
+				powerUp.setVelY(2);
+			}
 			c.parar(tiempoAcumulado);
 			pause = false;
 		}
@@ -248,8 +277,9 @@ public class PantallaJuego implements Pantalla {
 	private void movIzquierda() {
 		if (!pause) {
 			barra_jugador.setVelX(-VEL_BARRA);
+
 			if (!jugando) {
-				bola.setVelX(-VEL_BARRA);
+				arrayBola.get(0).setVelX(-VEL_BARRA);
 			}
 		}
 		movimientoTecla = true;
@@ -267,7 +297,7 @@ public class PantallaJuego implements Pantalla {
 		if (!pause) {
 			barra_jugador.setVelX(VEL_BARRA);
 			if (!jugando) {
-				bola.setVelX(VEL_BARRA);
+				arrayBola.get(0).setVelX(VEL_BARRA);
 			}
 		}
 		movimientoTecla = true;
@@ -280,22 +310,82 @@ public class PantallaJuego implements Pantalla {
 	public void comprobarColision() {
 		// Comprobacion de colision bola-ladrillo.
 		for (int i = 0; i < ladrillos.size(); i++) {
-			if (bola.colisionBarraLadrillo(ladrillos.get(i))) {
-				ladrillos.remove(i);
-				score += 10;
+			for (int j = 0; j < arrayBola.size(); j++) {
+				if (arrayBola.get(j).colisionBarraLadrillo(ladrillos.get(i))) {
+					ladrillos.remove(i);
+					// Lanzamos un powerUp para conseguir privilegios.
+					if (new Random().nextInt(2) == 1 && powerUp == null) {
+						powerUp = new Sprite(Math.abs(new Random().nextInt(panelJuego.getWidth() - 90)),
+								ladrillos.get(i).getPosY(), 30, 10, 0, 2,
+								colorLad[new Random().nextInt(colorLad.length)]);
+					}
+					score += 10;
+				}
 			}
+
 		}
 
 		// Comprobacion de colision bola-barra.
-		if (!(bola.getPosY() > barra_jugador.getPosY()) && bola.colisiona(barra_jugador)) {
-			bola.setVelX(new Random().nextInt(17) - 8);
-			bola.setVelY(-bola.getVelY());
+		for (int i = 0; i < arrayBola.size(); i++) {
+			if (!(arrayBola.get(i).getPosY() > barra_jugador.getPosY()) && arrayBola.get(i).colisiona(barra_jugador)) {
+				arrayBola.get(i).setVelX(new Random().nextInt(16) - 7);
+				arrayBola.get(i).setVelY(-arrayBola.get(i).getVelY());
+			}
 		}
 
 		// Comprobacion si no damos a la bola.
-		if (bola.getPosY() > panelJuego.getHeight()) {
-			tiempo = df.format(tiempoTotal);
-			panelJuego.setPantalla(new PantallaOver(panelJuego, tiempo));
+		for (int i = 0; i < arrayBola.size(); i++) {
+			if (arrayBola.get(i).getPosY() > panelJuego.getHeight()) {
+				arrayBola.remove(i);
+				if (arrayBola.size() == 0) {
+					tiempo = df.format(tiempoTotal);
+					panelJuego.setPantalla(new PantallaOver(panelJuego, tiempo));
+				}
+
+			}
+		}
+
+	}
+
+	private void colisionPowerUp() {
+		// Comprobacion si no damos al powerUp.
+		if (powerUp.getPosY() >= panelJuego.getHeight() && powerUp != null) {
+			powerUp = null;
+		}
+		// Comprobacion powerUp-barra.
+		if (powerUp != null && barra_jugador.colisiona(powerUp)) {
+			opcionPowerUp();
+			powerUp = null;
+		}
+
+	}
+
+	/**
+	 * Metodo donde realizamos que ventaja o desventaja le otorgamos al jugador.
+	 * Dependiendo del color del powerUp obtenemos una cosa u otra.
+	 */
+	public void opcionPowerUp() {
+		if (powerUp.getColor() == colorLad[0]) {
+			barra_jugador = new Sprite(barra_jugador.getPosX(), barra_jugador.getPosY(), 170, 20, VEL_BARRA, 0,
+					imagen_barra, true);
+		}
+		for (int i = 0; i < arrayBola.size(); i++) {
+			if (powerUp.getColor() == colorLad[1]) {
+				arrayBola.get(i).setVelY(arrayBola.get(i).getVelY() > 0 ? +2 : -2);
+			}
+		}
+
+		if (powerUp.getColor() == colorLad[2]) {
+			barra_jugador = new Sprite(barra_jugador.getPosX(), barra_jugador.getPosY(), 70, 20, -VEL_BARRA, 0,
+					imagen_barra, true);
+		}
+		if (powerUp.getColor() == colorLad[3]) {
+			if (arrayBola.size() != 2) {
+				bola = new Sprite(barra_jugador.getPosX() + 10, panelJuego.getHeight() - 105, 15, 15, VEL_BOLA,
+						-VEL_BOLA, imagen_bola, true);
+				arrayBola.add(bola);
+			}
+
 		}
 	}
 
@@ -336,7 +426,9 @@ public class PantallaJuego implements Pantalla {
 			g.drawString("PAUSE!", panelJuego.getWidth() / 2 - 140, panelJuego.getHeight() / 2);
 			g.setFont(fuenteLvl);
 			g.setColor(Color.YELLOW);
-			g.drawString("ESC VOLVER AL MENU", panelJuego.getWidth() / 2 - 160, panelJuego.getHeight() / 2 + 60);
+			g.drawString("'ESC' VOLVER AL MENU", panelJuego.getWidth() / 2 - 175, panelJuego.getHeight() / 2 + 60);
+			g.setFont(new Font("Chiller", Font.ITALIC, 30));
+			g.drawString("'P' PARA CONTINUAR", panelJuego.getWidth() / 2 - 125, panelJuego.getHeight() / 2 + 100);
 		} else {
 			g.drawString("", 0, 0);
 		}
@@ -354,7 +446,13 @@ public class PantallaJuego implements Pantalla {
 		for (int i = 0; i < ladrillos.size(); i++) {
 			ladrillos.get(i).pintarEnMundo(g);
 		}
-		bola.pintarEnMundo(g);
+		for (int i = 0; i < arrayBola.size(); i++) {
+			arrayBola.get(i).pintarEnMundo(g);
+		}
+
+		if (powerUp != null) {
+			powerUp.pintarEnMundo(g);
+		}
 	}
 
 	/**
@@ -365,14 +463,17 @@ public class PantallaJuego implements Pantalla {
 	public void moverSprite(boolean movimiento, boolean pressEspacio) {
 		if (movimiento && !pressEspacio) {
 			barra_jugador.actualizarPosicion(panelJuego);
-			bola.actualizarPosicion(panelJuego);
+			arrayBola.get(0).actualizarPosicion(panelJuego);
 		}
 		if (movimiento && pressEspacio) {
 			barra_jugador.actualizarPosicion(panelJuego);
 		}
 		if (pressEspacio) {
-			bola.actualizarPosicion(panelJuego);
+			for (int i = 0; i < arrayBola.size(); i++) {
+				arrayBola.get(i).actualizarPosicion(panelJuego);
+			}
 		}
+
 	}
 
 	/**
@@ -397,6 +498,7 @@ public class PantallaJuego implements Pantalla {
 		// Sprite bola.
 		bola = new Sprite(panelJuego.getWidth() / 2 + 10, panelJuego.getHeight() - 105, 15, 15, 0, 0, imagen_bola,
 				true);
+		arrayBola.add(bola);
 
 		// Sprite cuadrado.
 		int iniX = 150, iniY = 150; // Posicion de inicio x e y.

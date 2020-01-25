@@ -22,9 +22,7 @@ public class Sprite {
 	protected int velY;
 	protected BufferedImage buffer;
 
-	/** VARIABLES POSICION ANTERIOR BOLA **/
-	int posAntX;
-	int posAntY;
+	Color color;
 
 	/**
 	 * Constructor privado para evitar repetición de código en los otros
@@ -46,11 +44,12 @@ public class Sprite {
 	 */
 	public Sprite(int posX, int posY, int ancho, int alto, int velX, int velY, Color color) {
 		this(posX, posY, ancho, alto, velX, velY);
+		this.color = color;
 		pintarBuffer(color);
 	}
 
 	/**
-	 * Inicizaliza el {@link Sprite} a partir de un Image ya creado.
+	 * Inicializa el {@link Sprite} a partir de un Image ya creado.
 	 * 
 	 * @param imgConstructor
 	 * @param redimensionar  Si vale verdadero es necesario redimensionar el buffer
@@ -71,7 +70,7 @@ public class Sprite {
 		buffer = new BufferedImage(this.ancho, this.alto, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = buffer.getGraphics();
 		g.setColor(color);
-		g.fillRoundRect(0, 0, ancho, alto, 15, 15);
+		g.fillRect(0, 0, ancho, alto);
 		g.dispose();
 	}
 
@@ -140,7 +139,7 @@ public class Sprite {
 
 		if (colisiona(ladrillo)) {
 			// posX - ancho -> bola.
-			if (posX + ancho - 1 <= ladrillo.posX || posX + 1 > ladrillo.posX + ladrillo.ancho) {
+			if (posX + ancho - 1 <= ladrillo.posX || posX > ladrillo.posX + ladrillo.ancho) {
 				velX = -velX;
 			} else {
 				velY = -velY;
@@ -229,4 +228,13 @@ public class Sprite {
 	public void setBuffer(BufferedImage buffer) {
 		this.buffer = buffer;
 	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	
 }

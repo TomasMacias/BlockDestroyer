@@ -32,9 +32,6 @@ public class PantallaInstrucciones implements Pantalla {
 	private BufferedImage fondo;
 	private Image fondoEscalado, gifImage;
 
-	/** RUTA IMAGEN GIF **/
-	// https://www.programoergosum.com/images/cursos/111-juego-de-arkanoid-programado-con-scratch/proyecto-pablorubma.gif
-
 	public PantallaInstrucciones(PanelJuego panel) {
 		inicializarPantalla(panel);
 	}
@@ -44,7 +41,7 @@ public class PantallaInstrucciones implements Pantalla {
 		this.panelJuego = panel;
 		try {
 			fondo = ImageIO.read(new File("img/fondo.jpg"));
-			gifImage = new ImageIcon("img/imagenJuego.gif").getImage();
+			gifImage = new ImageIcon("img/gif.gif").getImage();
 		} catch (Exception e) {
 			System.out.println("PROBLEMAS AL CARGAR LAS IMAGENES FIN DEL PROGRAMA");
 		}
@@ -96,12 +93,33 @@ public class PantallaInstrucciones implements Pantalla {
 		g.drawString("Pulse 'ESC' para volver al menu.", 30, 30);
 		g.setFont(fuenteLetra);
 		g.setColor(Color.GREEN);
-		g.drawString("A | ←: → Movimiento para la izquierda.", 30, 70);
-		g.drawString("D | →: → Movimiento para la derecha.", 30, 110);
-		g.drawString("|________| → Iniciar juego.", 30, 150);
-		g.drawString("P → Pausar/Reanudar juego", 30, 190);
-		g.drawImage(gifImage, 60, 250, null);
+		g.drawString("A | <-: Movimiento para la izquierda.", 30, 70);
+		g.drawString("D | ->: Movimiento para la derecha.", 30, 110);
+		g.drawString("|________|: Iniciar juego.", 30, 150);
+		g.drawString("P: Pausar/Reanudar juego", 30, 190);
+		
+		mensajePowerUp(g);
+		g.drawImage(gifImage, 325, 480, null);
 
+	}
+
+	private void mensajePowerUp(Graphics g) {
+		g.drawString("Power UP:", 30, 230);
+		g.setColor(Color.GRAY);
+		g.fillRect(50, 260, 30, 10);
+		g.drawString("Aumento de tama�o la barra.", 90, 270);
+		g.setColor(Color.YELLOW);
+		g.fillRect(50, 300, 30, 10);
+		g.drawString("Aumento de velocidad de la bola.", 90, 310);
+		g.setColor(Color.WHITE);
+		g.fillRect(50, 340, 30, 10);
+		g.drawString("Disminucion de tama�o la barra.", 90, 350);
+		g.setColor(Color.RED);
+		g.fillRect(50, 380, 30, 10);
+		g.drawString("Rojo: Lanzamiento de una bola extra.", 90, 390);
+		g.setColor(Color.PINK);
+		g.fillRect(50, 420, 30, 10);
+		g.drawString("Aumento de velocidad a la barra.", 90, 430);
 	}
 
 }

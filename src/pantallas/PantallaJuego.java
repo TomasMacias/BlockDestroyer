@@ -25,6 +25,8 @@ public class PantallaJuego implements Pantalla {
 
 	/** PANEL JUEGO **/
 	PanelJuego panelJuego;
+	String letraMapa;
+	char[] mapa;
 
 	/** DIRECCION DE IMAGEN FONDO, BOLA Y BARRA **/
 	// https://www.freepik.es/fotos-vectores-gratis/fondo
@@ -38,12 +40,13 @@ public class PantallaJuego implements Pantalla {
 	final Color colorLad[] = { Color.GRAY, Color.YELLOW, Color.WHITE, Color.RED, Color.PINK };
 	final Font fuenteVolver = new Font("", Font.BOLD, 20);
 
-	final static int TOTAL_LADRILLO = 70;
 	final static int ANCHO_LADRILLO = 60;
-	final static int ALTO_LADRILLO = 25;
+	final static int ALTO_LADRILLO = 20;
 	final static int VEL_BOLA = 8;
-	final static int VEL_BARRA = 15;
 	final static int MAX_BOLA = 2;
+
+	static int vel_barra = 15;
+	int lvl;
 	/** IMAGENES **/
 	private BufferedImage fondo;
 	private Image fondoEscalado, imagen_lateral, imagen_arriba, imagen_bola, imagen_barra;
@@ -74,9 +77,11 @@ public class PantallaJuego implements Pantalla {
 	Cronometro c;
 
 	/** VARIABLE PARA SCORE **/
-	int score = 0;
+	int score;
 
-	public PantallaJuego(PanelJuego panelJuego) {
+	public PantallaJuego(PanelJuego panelJuego, int lvl, int score) {
+		this.lvl = lvl;
+		this.score = score;
 		inicializarPantalla(panelJuego);
 	}
 
@@ -111,14 +116,13 @@ public class PantallaJuego implements Pantalla {
 
 		if (jugando) {
 			if (!pause) { // Mientras el juego no estÃ© pausado. Seguimos sumando el tiempo.
-				tiempoTotal = tiempoAcumulado + c.getTiempoTranscurrido();
 				comprobarVictoria();
 				comprobarColision();
 				if (powerUp != null) {
 					powerUp.actualizarPosicion(panelJuego);
 					colisionPowerUp();
 				}
-
+				tiempoTotal = tiempoAcumulado + c.getTiempoTranscurrido();
 			}
 		}
 
@@ -201,16 +205,14 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void iniciarJuego() {
 		if (!jugando) {
-			for (int i = 0; i < arrayBola.size(); i++) {
-				if (new Random().nextInt(2) == 0) {
-					arrayBola.get(i).setVelX(new Random().nextInt(9));
-				} else {
-					arrayBola.get(i).setVelX(new Random().nextInt(9) - 8);
-				}
-
-				arrayBola.get(i).setVelY(-VEL_BOLA);
-
+			if (new Random().nextInt(2) == 0) {
+				arrayBola.get(0).setVelX(new Random().nextInt(9));
+			} else {
+				arrayBola.get(0).setVelX(new Random().nextInt(9) - 8);
 			}
+
+			arrayBola.get(0).setVelY(-VEL_BOLA);
+
 			jugando = true;
 			c = new Cronometro();
 			c.comenzar(0);
@@ -232,18 +234,19 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void pauseGame() {
 		if (!pause) {
-			for (int i = 0; i < arrayBola.size(); i++) {
-				velXBola1 = arrayBola.get(i).getVelX();
-				velYBola1 = arrayBola.get(i).getVelY();
-				System.out.println("Velx -> "+velXBola1 + " VelY -> " + velYBola1);
-				if (arrayBola.size() < 2) {
-					System.out.println("hola.");
-				}
-				barra_jugador.setVelX(0);
-				arrayBola.get(i).setVelX(0);
-				arrayBola.get(i).setVelY(0);
 
+			velXBola1 = arrayBola.get(0).getVelX();
+			velYBola1 = arrayBola.get(0).getVelY();
+			if (arrayBola.size() == 2) {
+				velXBola2 = arrayBola.get(1).getVelX();
+				velYBola2 = arrayBola.get(1).getVelY();
+				arrayBola.get(1).setVelX(0);
+				arrayBola.get(1).setVelY(0);
 			}
+			barra_jugador.setVelX(0);
+			arrayBola.get(0).setVelX(0);
+			arrayBola.get(0).setVelY(0);
+
 			if (powerUp != null) {
 				powerUp.setVelY(0);
 			}
@@ -251,11 +254,14 @@ public class PantallaJuego implements Pantalla {
 			c.parar(tiempoAcumulado);
 			pause = true;
 		} else {
-			barra_jugador.setVelX(-VEL_BARRA);
-			System.out.println("Velx -> "+velXBola1 + " VelY -> " + velYBola1);
-			for (int i = 0; i < arrayBola.size(); i++) {
-				arrayBola.get(i).setVelX(velXBola1);
-				arrayBola.get(i).setVelY(velYBola1);
+			barra_jugador.setVelX(-vel_barra);
+			// Guardamos las velocidades de la bola1 .
+			arrayBola.get(0).setVelX(velXBola1);
+			arrayBola.get(0).setVelY(velYBola1);
+			if (arrayBola.size() == 2) { // Si el arrayList contiene 2 objetos significa que tenemos dos bolas, entonces
+											// asignamos las velocidades la bola2.
+				arrayBola.get(1).setVelX(velXBola2);
+				arrayBola.get(1).setVelY(velYBola2);
 			}
 
 			if (powerUp != null) {
@@ -276,10 +282,10 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void movIzquierda() {
 		if (!pause) {
-			barra_jugador.setVelX(-VEL_BARRA);
+			barra_jugador.setVelX(-vel_barra);
 
 			if (!jugando) {
-				arrayBola.get(0).setVelX(-VEL_BARRA);
+				arrayBola.get(0).setVelX(-vel_barra);
 			}
 		}
 		movimientoTecla = true;
@@ -295,9 +301,9 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void movDerecha() {
 		if (!pause) {
-			barra_jugador.setVelX(VEL_BARRA);
+			barra_jugador.setVelX(vel_barra);
 			if (!jugando) {
-				arrayBola.get(0).setVelX(VEL_BARRA);
+				arrayBola.get(0).setVelX(vel_barra);
 			}
 		}
 		movimientoTecla = true;
@@ -311,12 +317,13 @@ public class PantallaJuego implements Pantalla {
 		// Comprobacion de colision bola-ladrillo.
 		for (int i = 0; i < ladrillos.size(); i++) {
 			for (int j = 0; j < arrayBola.size(); j++) {
-				if (arrayBola.get(j).colisionBarraLadrillo(ladrillos.get(i))) {
+				if (arrayBola.get(j).colisionBolaLadrillo(ladrillos.get(i))) {
 					ladrillos.remove(i);
+
 					// Lanzamos un powerUp para conseguir privilegios.
 					if (new Random().nextInt(2) == 1 && powerUp == null) {
-						powerUp = new Sprite(Math.abs(new Random().nextInt(panelJuego.getWidth() - 90)),
-								ladrillos.get(i).getPosY(), 30, 10, 0, 2,
+						powerUp = new Sprite(Math.abs(new Random().nextInt(panelJuego.getWidth()) - 60),
+								arrayBola.get(j).getPosY(), 30, 10, 0, 2,
 								colorLad[new Random().nextInt(colorLad.length)]);
 					}
 					score += 10;
@@ -366,17 +373,18 @@ public class PantallaJuego implements Pantalla {
 	 */
 	public void opcionPowerUp() {
 		if (powerUp.getColor() == colorLad[0]) {
-			barra_jugador = new Sprite(barra_jugador.getPosX(), barra_jugador.getPosY(), 170, 20, VEL_BARRA, 0,
+			barra_jugador = new Sprite(barra_jugador.getPosX(), barra_jugador.getPosY(), 170, 20, vel_barra, 0,
 					imagen_barra, true);
 		}
 		for (int i = 0; i < arrayBola.size(); i++) {
 			if (powerUp.getColor() == colorLad[1]) {
-				arrayBola.get(i).setVelY(arrayBola.get(i).getVelY() > 0 ? +2 : -2);
+				arrayBola.get(i).setVelY(arrayBola.get(i).getVelY() > 0 ? arrayBola.get(i).getVelY() + 2
+						: arrayBola.get(i).getVelY() - 2);
 			}
 		}
 
 		if (powerUp.getColor() == colorLad[2]) {
-			barra_jugador = new Sprite(barra_jugador.getPosX(), barra_jugador.getPosY(), 70, 20, -VEL_BARRA, 0,
+			barra_jugador = new Sprite(barra_jugador.getPosX(), barra_jugador.getPosY(), 70, 20, -vel_barra, 0,
 					imagen_barra, true);
 		}
 		if (powerUp.getColor() == colorLad[3]) {
@@ -385,7 +393,9 @@ public class PantallaJuego implements Pantalla {
 						-VEL_BOLA, imagen_bola, true);
 				arrayBola.add(bola);
 			}
-
+		}
+		if (powerUp.getColor() == colorLad[4]) {
+			vel_barra = vel_barra + 6;
 		}
 	}
 
@@ -395,7 +405,12 @@ public class PantallaJuego implements Pantalla {
 	 */
 	public void comprobarVictoria() {
 		if (ladrillos.size() == 0) {
-			panelJuego.setPantalla(new PantallaVictoria(panelJuego, score, tiempo));
+			if (lvl + 1 == 2) {
+				panelJuego.setPantalla(new PantallaVictoria(panelJuego, score));
+			} else {
+				panelJuego.setPantalla(new PantallaNivel(panelJuego, lvl, score));
+			}
+
 		}
 	}
 
@@ -410,7 +425,7 @@ public class PantallaJuego implements Pantalla {
 		g.setColor(colorLvl);
 		g.setFont(fuenteLvl);
 		g.drawString("SCORE: " + score, 25, 50);
-		g.drawString("LVL: ", panelJuego.getWidth() - 110, 50);
+		g.drawString("LVL: " + lvl, panelJuego.getWidth() - 110, 50);
 
 		// Tiempo.
 		g.setFont(fuenteTiempo);
@@ -500,20 +515,58 @@ public class PantallaJuego implements Pantalla {
 				true);
 		arrayBola.add(bola);
 
+		switch (lvl) {
+		case 0:
+			lvl0();
+			break;
+		case 1:
+			lvl1();
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void lvl0() {
 		// Sprite cuadrado.
 		int iniX = 150, iniY = 150; // Posicion de inicio x e y.
 		int cColor = 0; // Indicador del color.
-		for (int i = 1; i < TOTAL_LADRILLO + 1; i++) {
+		for (int i = 1; i < 71; i++) {
 			ladrilloAux = new Sprite(iniX, iniY, ANCHO_LADRILLO, ALTO_LADRILLO, 0, 0, colorLad[cColor]);
 			ladrillos.add(ladrilloAux);
 			iniX += ANCHO_LADRILLO + 5;
 
 			if (i % 14 == 0) {
-				iniY += 50;
+				iniY += 60;
 				iniX = 150;
 				cColor++;
 			}
 
+		}
+	}
+
+	private void lvl1() {
+		// Sprite cuadrado.
+		letraMapa = "000BB00000BB000\n" + "BBBBBBBBBBBBBBB\n" + "000BB00000BB000\n" + "BBBBBBBBBBBBBBB\n"
+				+ "000BB00000BB000";
+		mapa = new char[letraMapa.length()];
+		for (int i = 0; i < letraMapa.length(); i++) {
+			mapa[i] = letraMapa.charAt(i);
+		}
+		int iniX = 70, iniY = 150;
+		int cColor = 0;
+		for (int j = 0; j < mapa.length; j++) {
+			if (mapa[j] == 'B') {
+				ladrilloAux = new Sprite(iniX, iniY, ANCHO_LADRILLO, ALTO_LADRILLO, 0, 0, colorLad[cColor]);
+				ladrillos.add(ladrilloAux);
+			}
+
+			if (j == 14 || j == 29 || j == 44 || j == 59) {
+				iniY += 70;
+				iniX = 50;
+				cColor++;
+			}
+			iniX += ANCHO_LADRILLO + 5;
 		}
 	}
 

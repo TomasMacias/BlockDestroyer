@@ -103,7 +103,7 @@ public class Sprite {
 			setVelX(Math.abs(velX));
 		}
 
-		if (posY < 108) {
+		if (posY < 105) {
 			setVelY(Math.abs(velY));
 		}
 
@@ -135,12 +135,12 @@ public class Sprite {
 	 * @param ladrillo
 	 * @return
 	 */
-	public boolean colisionBarraLadrillo(Sprite ladrillo) {
+	public boolean colisionBolaLadrillo(Sprite ladrillo) {
 
 		if (colisiona(ladrillo)) {
 			// posX - ancho -> bola.
-			if (posX + ancho - 1 <= ladrillo.posX || posX > ladrillo.posX + ladrillo.ancho) {
-				velX = -velX;
+			if (posX + ancho+1 <= ladrillo.posX || posX-ancho > ladrillo.posX + ladrillo.ancho) {
+				setVelX(Math.abs(velX) * -1);
 			} else {
 				velY = -velY;
 			}

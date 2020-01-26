@@ -39,13 +39,10 @@ public class PantallaVictoria implements Pantalla {
 	private Image fondoEscalado;
 
 	/** FUENTES **/
-
-	String tiempo;
 	int score;
 
-	public PantallaVictoria(PanelJuego panelJuego, int score, String tiempo) {
+	public PantallaVictoria(PanelJuego panelJuego, int score) {
 		this.score = score;
-		this.tiempo = tiempo;
 		inicializarPantalla(panelJuego);
 	}
 
@@ -77,7 +74,7 @@ public class PantallaVictoria implements Pantalla {
 	public void pulsarTecla(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case 10:
-			panelJuego.setPantalla(new PantallaJuego(panelJuego));
+			panelJuego.setPantalla(new PantallaJuego(panelJuego, 0,0));
 			break;
 		case 27:
 			panelJuego.setPantalla(new PantallaInicial(panelJuego));
@@ -117,8 +114,6 @@ public class PantallaVictoria implements Pantalla {
 		g.drawRect(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() - 290, 330, 210);
 		g.setColor(colorLetra);
 		g.drawString("SCORE: ", panelJuego.getWidth() / 2 - 140, panelJuego.getHeight() - 250);
-		g.setFont(fuenteTiempo);
-		g.drawString("TIME: " + tiempo, panelJuego.getWidth() / 2 - 140, panelJuego.getHeight() - 200);
 		g.setFont(fuenteVictoria);
 		g.drawString("Pulsa 'ENTER' para volver a jugar.", panelJuego.getWidth() / 2 - 140,
 				panelJuego.getHeight() - 150);

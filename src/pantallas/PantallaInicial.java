@@ -63,7 +63,7 @@ public class PantallaInicial implements Pantalla {
 	public void pulsarTecla(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case 10:
-			panelJuego.setPantalla(new PantallaJuego(panelJuego));
+			panelJuego.setPantalla(new PantallaJuego(panelJuego,0,0));
 			break;
 		case 73:
 			panelJuego.setPantalla(new PantallaInstrucciones(panelJuego));
@@ -112,7 +112,7 @@ public class PantallaInicial implements Pantalla {
 	public void mensajeInstrucciones(Graphics g) {
 		g.setFont(fuenteInstrucciones);
 		g.setColor(Color.GREEN);
-		g.drawString("PULSA 'I' INSTRUCCIONES", panelJuego.getWidth() / 2 - 200, panelJuego.getHeight() / 2 + 155);
+		g.drawString("PULSA 'I' INSTRUCCIONES", panelJuego.getWidth() / 2 - 200, panelJuego.getHeight() / 2 + 155);		
 	}
 
 	public void mensajeSalir(Graphics g) {

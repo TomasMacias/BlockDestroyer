@@ -70,7 +70,7 @@ public class PantallaOver implements Pantalla {
 	public void pulsarTecla(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ENTER:
-			panelJuego.setPantalla(new PantallaJuego(panelJuego));
+			panelJuego.setPantalla(new PantallaJuego(panelJuego,0,0));
 			break;
 		case KeyEvent.VK_ESCAPE:
 			System.exit(0);

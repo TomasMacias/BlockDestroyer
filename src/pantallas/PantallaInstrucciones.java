@@ -40,8 +40,8 @@ public class PantallaInstrucciones implements Pantalla {
 	public void inicializarPantalla(PanelJuego panel) {
 		this.panelJuego = panel;
 		try {
-			fondo = ImageIO.read(new File("img/fondo.jpg"));
-			gifImage = new ImageIcon("img/gif.gif").getImage();
+			fondo = ImageIO.read(new File(".//img//fondo.jpg"));
+			gifImage = new ImageIcon(".//img//gif.gif").getImage();
 		} catch (Exception e) {
 			System.out.println("PROBLEMAS AL CARGAR LAS IMAGENES FIN DEL PROGRAMA");
 		}
@@ -97,7 +97,7 @@ public class PantallaInstrucciones implements Pantalla {
 		g.drawString("D | ->: Movimiento para la derecha.", 30, 110);
 		g.drawString("|________|: Iniciar juego.", 30, 150);
 		g.drawString("P: Pausar/Reanudar juego", 30, 190);
-		
+
 		mensajePowerUp(g);
 		g.drawImage(gifImage, 325, 480, null);
 

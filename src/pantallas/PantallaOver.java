@@ -47,7 +47,7 @@ public class PantallaOver implements Pantalla {
 		this.panelJuego = panelJuego;
 		
 		try {
-			fondo = ImageIO.read(new File("img/game_over.jpg"));
+			fondo = ImageIO.read(new File(".//img//game_over.jpg"));
 		} catch (Exception e) {
 			System.out.println("PROBLEMAS AL CARGAR LAS IMAGENES. FIN DEL PROGRAMA");
 		}

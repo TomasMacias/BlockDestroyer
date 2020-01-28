@@ -50,7 +50,7 @@ public class PantallaVictoria implements Pantalla {
 	public void inicializarPantalla(PanelJuego panelJuego) {
 		this.panelJuego = panelJuego;
 		try {
-			fondo = ImageIO.read(new File("img/win.png"));
+			fondo = ImageIO.read(new File(".//img//win.png"));
 		} catch (Exception e) {
 			System.out.println("PROBLEMAS AL CARGAR LAS IMAGENENES. FIN DEL PROGRAMA");
 		}
@@ -113,7 +113,7 @@ public class PantallaVictoria implements Pantalla {
 		g.setColor(colorCuadradoDos);
 		g.drawRect(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() - 290, 330, 210);
 		g.setColor(colorLetra);
-		g.drawString("SCORE: ", panelJuego.getWidth() / 2 - 140, panelJuego.getHeight() - 250);
+		g.drawString("SCORE: " + score, panelJuego.getWidth() / 2 - 140, panelJuego.getHeight() - 250);
 		g.setFont(fuenteVictoria);
 		g.drawString("Pulsa 'ENTER' para volver a jugar.", panelJuego.getWidth() / 2 - 140,
 				panelJuego.getHeight() - 150);

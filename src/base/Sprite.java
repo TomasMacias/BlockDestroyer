@@ -103,7 +103,7 @@ public class Sprite {
 			setVelX(Math.abs(velX));
 		}
 
-		if (posY < 105) {
+		if (posY < 112) {
 			setVelY(Math.abs(velY));
 		}
 

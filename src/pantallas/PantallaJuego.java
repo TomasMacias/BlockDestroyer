@@ -91,11 +91,11 @@ public class PantallaJuego implements Pantalla {
 		powerUp = null;
 
 		try {
-			fondo = ImageIO.read(new File("img/fondoJuego.jpg"));
-			imagen_barra = ImageIO.read(new File("img/barra.png"));
-			imagen_lateral = ImageIO.read(new File("img/margen_lateral.png"));
-			imagen_arriba = ImageIO.read(new File("img/margen_arriba.png"));
-			imagen_bola = ImageIO.read(new File("img/bola.png"));
+			fondo = ImageIO.read(new File(".//img//fondoJuego.jpg"));
+			imagen_barra = ImageIO.read(new File(".//img//barra.png"));
+			imagen_lateral = ImageIO.read(new File(".//img//margen_lateral.png"));
+			imagen_arriba = ImageIO.read(new File(".//img//margen_arriba.png"));
+			imagen_bola = ImageIO.read(new File(".//img//bola.png"));
 		} catch (Exception e) {
 			System.out.println("ERROR AL CARGAR LAS IMAGENES.");
 		}
@@ -122,7 +122,10 @@ public class PantallaJuego implements Pantalla {
 					powerUp.actualizarPosicion(panelJuego);
 					colisionPowerUp();
 				}
-				tiempoTotal = tiempoAcumulado + c.getTiempoTranscurrido();
+				if (c != null) {
+					tiempoTotal = tiempoAcumulado + c.getTiempoTranscurrido();
+				}
+
 			}
 		}
 
@@ -282,6 +285,7 @@ public class PantallaJuego implements Pantalla {
 	 */
 	private void movIzquierda() {
 		if (!pause) {
+
 			barra_jugador.setVelX(-vel_barra);
 
 			if (!jugando) {
@@ -317,7 +321,9 @@ public class PantallaJuego implements Pantalla {
 		// Comprobacion de colision bola-ladrillo.
 		for (int i = 0; i < ladrillos.size(); i++) {
 			for (int j = 0; j < arrayBola.size(); j++) {
-				if (arrayBola.get(j).colisionBolaLadrillo(ladrillos.get(i))) {
+				Sprite bolaAux = arrayBola.get(j);
+				Sprite ladAux = ladrillos.get(i);
+				if (bolaAux.colisionBolaLadrillo(ladAux)) {
 					ladrillos.remove(i);
 
 					// Lanzamos un powerUp para conseguir privilegios.
@@ -326,7 +332,9 @@ public class PantallaJuego implements Pantalla {
 								arrayBola.get(j).getPosY(), 30, 10, 0, 2,
 								colorLad[new Random().nextInt(colorLad.length)]);
 					}
+					i = 0;
 					score += 10;
+
 				}
 			}
 

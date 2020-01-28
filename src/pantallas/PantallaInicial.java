@@ -41,7 +41,7 @@ public class PantallaInicial implements Pantalla {
 	public void inicializarPantalla(PanelJuego panelJuego) {
 		this.panelJuego = panelJuego;
 		try {
-			fondo = ImageIO.read(new File("img/fondo.jpg"));
+			fondo = ImageIO.read(new File(".//img//fondo.jpg"));
 
 		} catch (Exception e) {
 			System.out.println("PROBLEMAS AL CARGAR LAS IMAGENES FIN DEL PROGRAMA");
